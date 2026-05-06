@@ -228,7 +228,7 @@ Claude Code의 [`SKILL.md` 규약](https://docs.anthropic.com/en/docs/claude-cod
 
 ### 3 · 디자인 시스템은 테마 JSON이 아닌 이식 가능한 Markdown입니다.
 
-[`VoltAgent/awesome-design-md`][acd2]의 9섹션 `DESIGN.md` 스키마 — color, typography, spacing, layout, components, motion, voice, brand, anti-patterns. 모든 아티팩트가 활성 시스템에서 읽습니다. 시스템 전환 → 다음 렌더에 새 토큰 사용. 드롭다운에는 **Linear, Stripe, Vercel, Airbnb, Tesla, Notion, Apple, Anthropic, Cursor, Supabase, Figma, Resend, Raycast, Lovable, Cohere, Mistral, ElevenLabs, X.AI, Spotify, Webflow, Sanity, PostHog, Sentry, MongoDB, ClickHouse, Cal, Replicate, Clay, Composio, Xiaohongshu …** 총 72개가 있습니다.
+[`VoltAgent/awesome-design-md`][acd2]의 9섹션 `DESIGN.md` 스키마 — color, typography, spacing, layout, components, motion, voice, brand, anti-patterns. 모든 아티팩트가 활성 시스템에서 읽습니다. 시스템 전환 → 다음 렌더에 새 토큰 사용. 드롭다운에는 **Linear, Stripe, Vercel, Airbnb, Tesla, Notion, Apple, Anthropic, Cursor, Supabase, Figma, Resend, Raycast, Lovable, Cohere, Mistral, ElevenLabs, X.AI, Spotify, Webflow, Sanity, PostHog, Sentry, MongoDB, ClickHouse, Cal, Replicate, Clay, Composio, Xiaohongshu …** — 그리고 [`awesome-design-skills`][ads]에서 가져온 57개의 디자인 스킬이 있습니다.
 
 ### 4 · 초기화 질문 폼이 수정 작업의 80%를 막아줍니다.
 
@@ -264,12 +264,12 @@ DISCOVERY 지시문    (turn-1 폼, turn-2 브랜드 분기, TodoWrite, 5차원 
 └──────────────┬───────────────────────────────┬────────────────┘
                │ /api/*(dev에서 rewrite)        │
                ▼                                ▼
-   ┌─────────────────────────────────┐   /api/proxy/stream (SSE)
+   ┌─────────────────────────────────┐   /api/proxy/{provider}/stream (SSE)
    │  로컬 daemon(Express + SQLite)  │   ─→ 임의의 OpenAI 호환
    │                                 │      엔드포인트(BYOK)
    │  /api/agents         /api/skills│      SSRF 차단 포함
    │  /api/design-systems /api/projects/…
-   │  /api/chat (SSE)     /api/proxy/stream (SSE)
+   │  /api/chat (SSE)     /api/proxy/{provider}/stream (SSE)
    │  /api/templates      /api/import/claude-design
    │  /api/artifacts/save /api/artifacts/lint
    │  /api/upload         /api/projects/:id/files…
@@ -321,6 +321,8 @@ pnpm tools-dev run web
 ```
 
 환경 요구사항: Node `~24`와 pnpm `10.33.x`. `nvm` / `fnm`은 선택적 보조 도구일 뿐입니다; 사용한다면 `pnpm install` 전에 `nvm install 24 && nvm use 24` 또는 `fnm install 24 && fnm use 24`를 실행하세요.
+
+데스크탑/백그라운드 시작, 고정 포트 재시작, 미디어 생성 디스패처 확인(`OD_BIN`, `OD_DAEMON_URL`, `apps/daemon/dist/cli.js`)은 [`QUICKSTART.md`](QUICKSTART.md)를 참조하세요.
 
 첫 번째 로드 시:
 
