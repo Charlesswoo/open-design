@@ -35,7 +35,7 @@
 
 Anthropic의 [Claude Design][cd](2026-04-17 출시, Opus 4.7 기반)은 LLM이 장문의 글쓰기를 멈추고 디자인 산출물을 직접 내놓기 시작했을 때 어떤 일이 일어나는지 보여주었습니다. 순식간에 화제가 되었지만, 여전히 **클로즈드 소스**, 유료, 클라우드 전용, Anthropic 모델과 Anthropic 내부 skill에 종속된 상태입니다. 체크아웃도, 자가 호스팅도, Vercel 배포도, 에이전트 교체도 불가능합니다.
 
-**Open Design(OD)은 그 오픈소스 대안입니다.** 동일한 루프, 동일한 '아티팩트 우선' 사고방식, 종속성 없음. 우리는 에이전트를 만들지 않습니다 — 가장 강력한 코딩 에이전트는 이미 여러분의 노트북에 있습니다. 우리는 그것을 skill 기반 디자인 워크플로에 연결할 뿐입니다. 로컬에서는 `pnpm tools-dev`로 실행하고, 웹 레이어는 Vercel에 배포할 수 있으며, 모든 레이어에서 BYOK(자체 키 사용)가 가능합니다.
+**Open Design(OD)은 그 오픈소스 대안입니다.** 동일한 루프, 동일한 '아티팩트 우선' 사고방식, 벤더 종속 없음. 우리는 에이전트를 만들지 않습니다 — 가장 강력한 코딩 에이전트는 이미 여러분의 노트북에 있습니다. 우리는 그것을 skill 기반 디자인 워크플로에 연결할 뿐입니다. 로컬에서는 `pnpm tools-dev`로 실행하고, 웹 레이어는 Vercel에 배포할 수 있으며, 모든 레이어에서 BYOK(자체 키 사용)가 가능합니다.
 
 `시드 라운드를 위한 매거진 스타일 피치덱 만들어줘`라고 입력하세요. 모델이 픽셀 하나 그리기 전에 **초기화 질문 폼**이 먼저 등장합니다. 에이전트는 5가지 엄선된 시각적 방향 중 하나를 선택합니다. 실시간 `TodoWrite` 계획 카드가 UI에 스트리밍됩니다. Daemon이 디스크에 실제 프로젝트 폴더를 생성하며, seed 템플릿, 레이아웃 라이브러리, 자가 점검 체크리스트가 포함됩니다. 에이전트는 **pre-flight 점검을 반드시 수행**하고, 자신의 출력물에 대해 **5차원 검토**를 실행하며, 몇 초 후 샌드박스 iframe에 렌더링되는 단일 `<artifact>`를 내보냅니다.
 
@@ -632,6 +632,7 @@ daemon 부팅 시 `PATH`에서 자동 감지됩니다. 설정 필요 없음. 스
 |---|---|---|---|
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `claude` | `claude-stream-json`(타입 이벤트) | `claude -p <prompt> --output-format stream-json --verbose [--include-partial-messages] [--add-dir …] --permission-mode bypassPermissions` |
 | [Codex CLI](https://github.com/openai/codex) | `codex` | `json-event-stream` + `codex` 파서 | `codex exec --json --skip-git-repo-check --sandbox workspace-write -c sandbox_workspace_write.network_access=true [-C cwd] [--model …] [-c model_reasoning_effort=…]`(prompt는 stdin) |
+| Devin for Terminal | `devin` | `acp-json-rpc` | `devin --permission-mode dangerous --respect-workspace-trust false acp` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `gemini` | `json-event-stream` + `gemini` 파서 | `GEMINI_CLI_TRUST_WORKSPACE=true gemini --output-format stream-json --yolo [--model …]`(prompt는 stdin) |
 | [OpenCode](https://opencode.ai/) | `opencode` | `json-event-stream` + `opencode` 파서 | `opencode run --format json --dangerously-skip-permissions [--model …] -`(prompt는 stdin) |
 | [Cursor Agent](https://www.cursor.com/cli) | `cursor-agent` | `json-event-stream` + `cursor-agent` 파서 | `cursor-agent --print --output-format stream-json --stream-partial-output --force --trust [--workspace cwd] [--model …] -`(prompt는 stdin) |
@@ -640,7 +641,11 @@ daemon 부팅 시 `PATH`에서 자동 감지됩니다. 설정 필요 없음. 스
 | [Hermes](https://github.com/eqlabs/hermes) | `hermes` | `acp-json-rpc`(Agent Client Protocol) | `hermes acp --accept-hooks` |
 | Kimi CLI | `kimi` | `acp-json-rpc` | `kimi acp` |
 | [Pi](https://github.com/mariozechner/pi-ai) | `pi` | `pi-rpc`(stdio JSON-RPC) | `pi --mode rpc [--model …] [--thinking …]`(prompt는 RPC `prompt` 명령으로 전송) |
-| **OpenAI 호환 BYOK** | n/a | SSE 통과 | `POST /api/proxy/stream` → `<baseUrl>/v1/chat/completions`; loopback / link-local / RFC1918에 대한 SSRF 차단 |
+| [Kiro CLI](https://kiro.dev) | `kiro-cli` | `acp-json-rpc` | `kiro-cli acp` |
+| Kilo | `kilo` | `acp-json-rpc` | `kilo acp` |
+| [Mistral Vibe CLI](https://github.com/mistralai/mistral-vibe) | `vibe-acp` | `acp-json-rpc` | `vibe-acp` |
+| DeepSeek TUI | `deepseek` | `plain`(원시 stdout 청크) | `deepseek exec --auto [--model …] <prompt>`(prompt는 위치 인수) |
+| **멀티 프로바이더 BYOK** | n/a | SSE 정규화 | `POST /api/proxy/{anthropic,openai,azure,google}/stream` → Anthropic / OpenAI 호환 / Azure OpenAI / Gemini; loopback / link-local / RFC1918에 대한 SSRF 차단 |
 
 새 CLI 추가는 [`apps/daemon/src/agents.ts`](apps/daemon/src/agents.ts)에 항목 하나 추가하는 것입니다. 스트리밍 형식은 `claude-stream-json`, `copilot-stream-json`, `json-event-stream`(CLI별 `eventParser`와 함께), `acp-json-rpc`, `pi-rpc`, `plain` 중 하나입니다.
 
